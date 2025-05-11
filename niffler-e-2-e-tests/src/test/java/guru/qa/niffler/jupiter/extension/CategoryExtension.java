@@ -3,6 +3,7 @@ package guru.qa.niffler.jupiter.extension;
 import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.meta.User;
 import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.service.SpendDbClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -16,6 +17,7 @@ import guru.qa.niffler.Utils.RandomDataUtils;
 public class CategoryExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
+    private final SpendDbClient spendDbClient = new SpendDbClient();
     private final SpendApiClient spendApiClient = new SpendApiClient();
     private RandomDataUtils dataUtils = new RandomDataUtils();
 
@@ -27,7 +29,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterEachCallback,
                     if (ArrayUtils.isNotEmpty(anno.categories())) {
                         String categoryName = dataUtils.randomCategoryName();
                         CategoryJson category = new CategoryJson(null, categoryName, anno.username(), false);
-                        CategoryJson created = spendApiClient.createCategory(category);
+                        CategoryJson created = spendDbClient.createCategory(category);
                         if (anno.categories()[0].archived()) {
                             CategoryJson archivedCategory = new CategoryJson(
                                     created.id(),
